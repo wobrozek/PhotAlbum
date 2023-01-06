@@ -9,7 +9,6 @@ function PhotoCanvas(props) {
 	const isInitialMount = useRef(true);
 	const canvas = useRef(null);
 	const context = useContext(photoContext);
-	console.log(photoContext);
 
 	useEffect(
 		() => {

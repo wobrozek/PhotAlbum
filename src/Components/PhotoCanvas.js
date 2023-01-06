@@ -1,12 +1,15 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
 // import { FabricJSCanvas, useFabricJSEditor } from 'fabricjs-react';
 import { fabric } from 'fabric';
 import CloseIcon from '@mui/icons-material/Close';
+import { photoContext } from '../Pages/AlbumPage';
 
 function PhotoCanvas(props) {
 	// const [ canvas, setCanvas ] = useState('');
 	const isInitialMount = useRef(true);
 	const canvas = useRef(null);
+	const context = useContext(photoContext);
+	console.log(photoContext);
 
 	useEffect(
 		() => {
@@ -14,11 +17,10 @@ function PhotoCanvas(props) {
 				canvas.current = initCanvas();
 				isInitialMount.current = false;
 			} else {
-				console.log(props.elements);
-				addElements(canvas.current, props.elements);
+				addElements(canvas.current);
 			}
 		},
-		[ props.elements, props.width, props.height ]
+		[ props.width, props.height, context.page ]
 	);
 
 	const initCanvas = () => {
@@ -48,9 +50,7 @@ function PhotoCanvas(props) {
 
 	const deleteObject = (eventData, transform) => {
 		var target = transform.target;
-		var canvas = target.canvas;
-		canvas.remove(target);
-		canvas.requestRenderAll();
+		props.delete(target.id);
 	};
 
 	function renderIcon(ctx, left, top, styleOverride, fabricObject) {
@@ -76,12 +76,13 @@ function PhotoCanvas(props) {
 		canvi.height = props.height;
 		canvi.width = props.width;
 
-		elements.map((element) => {
+		context.page.map((element) => {
 			fabric.Image.fromURL(`data:image/jpg;base64,${element.base64}`, function(oImg) {
 				oImg.set({
 					left: 10,
 					top: 10
 				});
+				oImg.id = element.id;
 				oImg.scaleToWidth(200);
 				canvi.add(oImg);
 			});

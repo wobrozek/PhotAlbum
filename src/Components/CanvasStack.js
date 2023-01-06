@@ -11,17 +11,27 @@ const CanvasStack = () => {
 		axios
 			.get(`https://8feb88c6-7249-42ff-942f-8f21da1f33a2.mock.pstmn.io/album/${albumId}/photos`)
 			.then((response) => {
-				console.log(response.data);
 				setElements(response.data);
 			})
 			.catch((err) => console.error(err.message));
 	}
 
-	useEffect(() => {
-		downloadPhotos(parms.id);
-	}, []);
+	const deletePhoto = (id) => {
+		setElements(elements.filter((element) => element.id !== id));
+	};
 
-	return <PhotoCanvas elements={elements} width={500} height={500} />;
+	useEffect(
+		() => {
+			downloadPhotos(parms.id);
+		},
+		[ parms.id ]
+	);
+
+	return (
+		<React.Fragment>
+			<PhotoCanvas elements={elements} width={500} height={500} delete={deletePhoto} />
+		</React.Fragment>
+	);
 };
 
 export default CanvasStack;

@@ -32,12 +32,20 @@ export const AlbumPage = () => {
 	const [ index, setIndex ] = useState(0);
 
 	const removePage = () => {
-		allPages.splice(index, index);
-		if (index > allPages.length - 1) {
+		// todo:what if zero
+		// todo: move to dragable
+
+		allPages.splice(index, 1);
+		if (index > allPages.length - 1 && index !== 0) {
 			setIndex((piervIndex) => piervIndex - 1);
 		} else {
 			setPage(allPages[index]);
 		}
+	};
+
+	const newPage = () => {
+		allPages.splice(index + 1, index, []);
+		setIndex((piervIndex) => piervIndex + 1);
 	};
 
 	const nextPage = () => {
@@ -134,7 +142,7 @@ export const AlbumPage = () => {
 
 	return (
 		<div className="flex-column">
-			<pageContext.Provider value={{ page, allPages, index, nextPage, previousPage, removePage }}>
+			<pageContext.Provider value={{ page, allPages, index, nextPage, previousPage, removePage, newPage }}>
 				<CanvasPageControler />
 			</pageContext.Provider>
 			<photoContext.Provider value={{ page, changePhotoParametrs, fromDragToPage, fromPageToDrag }}>

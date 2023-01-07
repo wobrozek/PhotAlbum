@@ -20,7 +20,7 @@ export const CanvasPageControler = () => {
 				</button>
 			</div>
 			<div className="flex">
-				<button onClick={context.addPage}>
+				<button onClick={context.newPage}>
 					<AddIcon />
 				</button>
 				<button onClick={context.removePage}>

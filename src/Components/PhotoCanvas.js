@@ -16,7 +16,7 @@ function PhotoCanvas(props) {
 				canvas.current = initCanvas();
 				isInitialMount.current = false;
 			} else {
-				addElements(canvas.current);
+				if (context.page) addElements(canvas.current);
 			}
 		},
 		[ props.width, props.height, context.page ]
@@ -75,6 +75,7 @@ function PhotoCanvas(props) {
 		canvi.height = props.height;
 		canvi.width = props.width;
 
+		console.log(context);
 		context.page.map((element) => {
 			fabric.Image.fromURL(`data:image/jpg;base64,${element.base64}`, function(oImg) {
 				oImg.set({

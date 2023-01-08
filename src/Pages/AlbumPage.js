@@ -108,17 +108,18 @@ export const AlbumPage = () => {
 	};
 
 	const fromDragToPage = (photoId, x, y) => {
+		photoId = parseInt(photoId);
 		if (!isInCanvas(x, y)) return;
-		// const pageWithoutElement = dragImages.filter((element) => {
-		// 	if (photoId !== element.id) {
-		// 		return element;
-		// 	} else {
-		// 		setPage((previousState) => {
-		// 			return [ ...previousState, element ];
-		// 		});
-		// 	}
-		// });
-		// setDragImages(pageWithoutElement);
+		const pageWithoutElement = dragImages.filter((element) => {
+			if (photoId !== element.id) {
+				return element;
+			} else {
+				setPage((previousState) => {
+					return [ ...previousState, element ];
+				});
+			}
+		});
+		setDragImages(pageWithoutElement);
 	};
 
 	const changePhotoParametrs = (photoId, dictio) => {

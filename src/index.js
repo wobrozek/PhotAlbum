@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import CanvasStack from './Components/CanvasStack';
 import reportWebVitals from './reportWebVitals';
 import Error from './Pages/Error';
 import AlbumPage from './Pages/AlbumPage';

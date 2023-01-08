@@ -1,10 +1,10 @@
 import { CanvasPageControler } from '../Components/CanvasPageControler';
-import CanvasStack from '../Components/CanvasStack';
 import { PhotoPlaceholder } from '../Components/PhotoPlaceholder';
 import { createContext, useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import PhotoCanvas from '../Components/PhotoCanvas';
+import { height } from '@mui/system';
 
 // const ContextApi = () => {
 // 	const [ allPages, setAllPages ] = useState([ {} ]);
@@ -27,9 +27,12 @@ export const pageContext = createContext();
 
 export const AlbumPage = () => {
 	const [ allPages, setAllPages ] = useState([]);
-	const [ page, setPage ] = useState({});
+	const [ page, setPage ] = useState([]);
 	const [ dragImages, setDragImages ] = useState([]);
 	const [ index, setIndex ] = useState(0);
+	const indexRef = useRef(0);
+	const cordinantsRef = useRef({});
+	// const canvas = useRef();
 
 	const removePage = () => {
 		// todo:what if zero
@@ -39,7 +42,7 @@ export const AlbumPage = () => {
 		if (index > allPages.length - 1 && index !== 0) {
 			setIndex((piervIndex) => piervIndex - 1);
 		} else {
-			setPage(allPages[index]);
+			setPage(() => allPages[index]);
 		}
 	};
 
@@ -66,7 +69,8 @@ export const AlbumPage = () => {
 			allPages.push(arr.slice(i, i + 4));
 			console.log(allPages);
 		}
-		setPage(allPages[0]);
+		setPage(() => allPages[0]);
+		console.log(page);
 	};
 
 	const removePhoto = (pageId, photonumber) => {
@@ -77,32 +81,44 @@ export const AlbumPage = () => {
 		setPage[pageId].push(photo);
 	};
 
-	const fromDragToPage = (photoId) => {
-		const pageWithoutElement = page.filter((element) => {
+	const fromPageToDrag = (photoId) => {
+		console.log(indexRef);
+		allPages[indexRef.current] = allPages[indexRef.current].filter((element) => {
 			if (photoId !== element.id) {
-				return true;
+				return element;
 			} else {
 				setDragImages((previousState) => {
 					return [ ...previousState, element ];
 				});
-				return false;
 			}
 		});
-		setPage(pageWithoutElement);
+		setPage(allPages[indexRef.current]);
 	};
 
-	const fromPageToDrag = (photoId) => {
-		const pageWithoutElement = dragImages.filter((element) => {
-			if (photoId !== element.id) {
-				return true;
-			} else {
-				setPage((previousState) => {
-					return [ ...previousState, element ];
-				});
-				return false;
-			}
-		});
-		setDragImages(pageWithoutElement);
+	const isInCanvas = (x, y) => {
+		if (
+			x > cordinantsRef.current.left &&
+			x < cordinantsRef.current.left + cordinantsRef.current.width &&
+			y > cordinantsRef.current.top &&
+			y < cordinantsRef.current.top + cordinantsRef.current.height
+		) {
+			return true;
+		}
+		return false;
+	};
+
+	const fromDragToPage = (photoId, x, y) => {
+		if (!isInCanvas(x, y)) return;
+		// const pageWithoutElement = dragImages.filter((element) => {
+		// 	if (photoId !== element.id) {
+		// 		return element;
+		// 	} else {
+		// 		setPage((previousState) => {
+		// 			return [ ...previousState, element ];
+		// 		});
+		// 	}
+		// });
+		// setDragImages(pageWithoutElement);
 	};
 
 	const changePhotoParametrs = (photoId, dictio) => {
@@ -118,7 +134,7 @@ export const AlbumPage = () => {
 
 	function downloadPhotos(albumId) {
 		axios
-			.get(`https://8feb88c6-7249-42ff-942f-8f21da1f33a2.mock.pstmn.io/album/${albumId}/photos`)
+			.get(`https://run.mocky.io/v3/c3b8a64f-87b3-44c8-bf95-a63c32168389/${albumId}`)
 			.then((response) => {
 				initAllPage(response.data);
 			})
@@ -135,17 +151,20 @@ export const AlbumPage = () => {
 
 	useEffect(
 		() => {
-			setPage(allPages[index]);
+			indexRef.current = index;
+			setPage(() => allPages[index]);
 		},
 		[ index ]
 	);
 
 	return (
-		<div className="flex-column">
+		<div className="flex-column main">
 			<pageContext.Provider value={{ page, allPages, index, nextPage, previousPage, removePage, newPage }}>
 				<CanvasPageControler />
 			</pageContext.Provider>
-			<photoContext.Provider value={{ page, changePhotoParametrs, fromDragToPage, fromPageToDrag }}>
+			<photoContext.Provider
+				value={{ cordinantsRef, page, dragImages, changePhotoParametrs, fromDragToPage, fromPageToDrag }}
+			>
 				<PhotoCanvas width={500} height={500} />
 				<PhotoPlaceholder />
 			</photoContext.Provider>

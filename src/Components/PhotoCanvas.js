@@ -5,7 +5,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import { photoContext } from '../Pages/AlbumPage';
 
 function PhotoCanvas(props) {
-	// const [ canvas, setCanvas ] = useState('');
 	const isInitialMount = useRef(true);
 	const canvas = useRef(null);
 	const context = useContext(photoContext);
@@ -29,6 +28,14 @@ function PhotoCanvas(props) {
 			backgroundColor: '#D9D9D9'
 		});
 
+		//send corinants info to parent
+		context.cordinantsRef.current = {
+			height: props.height,
+			width: props.width,
+			top: canvi._offset.top,
+			left: canvi._offset.left
+		};
+
 		//edit photo edit border
 		fabric.Object.prototype.transparentCorners = false;
 		fabric.Object.prototype.cornerColor = 'blue';
@@ -49,7 +56,7 @@ function PhotoCanvas(props) {
 
 	const deleteObject = (eventData, transform) => {
 		var target = transform.target;
-		props.delete(target.id);
+		context.fromPageToDrag(target.id);
 	};
 
 	function renderIcon(ctx, left, top, styleOverride, fabricObject) {
@@ -75,7 +82,6 @@ function PhotoCanvas(props) {
 		canvi.height = props.height;
 		canvi.width = props.width;
 
-		console.log(context);
 		context.page.map((element) => {
 			fabric.Image.fromURL(`data:image/jpg;base64,${element.base64}`, function(oImg) {
 				oImg.set({

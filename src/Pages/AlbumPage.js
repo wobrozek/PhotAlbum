@@ -6,24 +6,8 @@ import axios from 'axios';
 import PhotoCanvas from '../Components/PhotoCanvas';
 import { height } from '@mui/system';
 
-// const ContextApi = () => {
-// 	const [ allPages, setAllPages ] = useState([ {} ]);
-// 	const [ page, setPage ] = useState({});
-// 	const removePage = (id) => {
-// 		setPage((people) => {
-// 			return people.filter((person) => person.id !== id);
-// 		});
-// 	};
-// 	const changePage = (arr) => {
-// 		setPage(arr);
-// 	};
-// };
-
 export const photoContext = createContext();
 export const pageContext = createContext();
-// const pageContext = createContext([]);
-// const dragImages = createContext([]);
-// const pageIndex = createContext(0);
 
 export const AlbumPage = () => {
 	const [ allPages, setAllPages ] = useState([]);
@@ -35,8 +19,9 @@ export const AlbumPage = () => {
 	// const canvas = useRef();
 
 	const removePage = () => {
-		// todo:what if zero
-		// todo: move to dragable
+		if (allPages.length === 1) return;
+		let newArr = allPages[indexRef.current];
+		setDragImages((pierv) => [ ...pierv, ...newArr ]);
 
 		allPages.splice(index, 1);
 		if (index > allPages.length - 1 && index !== 0) {
@@ -82,7 +67,6 @@ export const AlbumPage = () => {
 	};
 
 	const fromPageToDrag = (photoId) => {
-		console.log(indexRef);
 		allPages[indexRef.current] = allPages[indexRef.current].filter((element) => {
 			if (photoId !== element.id) {
 				return element;
@@ -114,9 +98,8 @@ export const AlbumPage = () => {
 			if (photoId !== element.id) {
 				return element;
 			} else {
-				setPage((previousState) => {
-					return [ ...previousState, element ];
-				});
+				allPages[index].push(element);
+				setPage(() => [ ...allPages[index] ]);
 			}
 		});
 		setDragImages(pageWithoutElement);
@@ -166,7 +149,7 @@ export const AlbumPage = () => {
 			<photoContext.Provider
 				value={{ cordinantsRef, page, dragImages, changePhotoParametrs, fromDragToPage, fromPageToDrag }}
 			>
-				<PhotoCanvas width={500} height={500} />
+				<PhotoCanvas />
 				<PhotoPlaceholder />
 			</photoContext.Provider>
 		</div>

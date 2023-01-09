@@ -7,13 +7,69 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+body * {
+  box-sizing: border-box;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
 
+.navbar {
+  padding: 10px;
+}
+
 .photoCanvas {
   color: blue;
+}
+
+button {
+  background-color: #fff;
+  border: 0 solid #fff;
+  padding: 0;
+}
+
+.btn-round {
+  border-radius: 50%;
+}
+
+.photoPlaceholder {
+  text-align: center;
+  align-items: center;
+  overflow-x: scroll;
+}
+
+.imgWraper {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  margin: 10px;
+}
+
+.imgWraper>img {
+  height: 100%;
+}
+
+.canvas-container {
+  margin: auto;
+  display: block;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-space-between {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes Load-spin {

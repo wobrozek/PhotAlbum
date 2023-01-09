@@ -9,7 +9,7 @@ import { pageContext } from '../Pages/AlbumPage';
 export const CanvasPageControler = () => {
 	const context = useContext(pageContext);
 	return (
-		<div className="flex-space-between">
+		<nav className="flex-space-between navbar">
 			<div className="flex">
 				<button className="btn-round" onClick={context.previousPage}>
 					<ArrowBackIcon />
@@ -30,6 +30,6 @@ export const CanvasPageControler = () => {
 					<DownloadIcon />
 				</button>
 			</div>
-		</div>
+		</nav>
 	);
 };

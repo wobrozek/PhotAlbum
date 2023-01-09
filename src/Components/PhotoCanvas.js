@@ -15,23 +15,31 @@ function PhotoCanvas(props) {
 				canvas.current = initCanvas();
 				isInitialMount.current = false;
 			} else {
+				console.log('rerender');
 				if (context.page) addElements(canvas.current);
 			}
 		},
-		[ props.width, props.height, context.page ]
+		[ context.page ]
 	);
 
+	function getSize() {
+		let width = window.innerWidth - 40;
+		let height = window.innerHeight - 200;
+		return [ width, height ];
+	}
+
 	const initCanvas = () => {
+		const [ widthGet, heightGet ] = getSize();
 		const canvi = new fabric.Canvas('canvas', {
-			height: props.height,
-			width: props.width,
+			height: heightGet,
+			width: widthGet,
 			backgroundColor: '#D9D9D9'
 		});
 
 		//send corinants info to parent
 		context.cordinantsRef.current = {
-			height: props.height,
-			width: props.width,
+			height: heightGet,
+			width: widthGet,
 			top: canvi._offset.top,
 			left: canvi._offset.left
 		};
@@ -79,8 +87,6 @@ function PhotoCanvas(props) {
 	const addElements = (canvi, elements) => {
 		canvi.clear();
 		canvi.backgroundColor = '#D9D9D9';
-		canvi.height = props.height;
-		canvi.width = props.width;
 
 		context.page.map((element) => {
 			fabric.Image.fromURL(`data:image/jpg;base64,${element.base64}`, function(oImg) {

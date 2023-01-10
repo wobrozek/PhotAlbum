@@ -4,7 +4,7 @@ import { createContext, useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import PhotoCanvas from '../Components/PhotoCanvas';
-import { height } from '@mui/system';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
 
 export const photoContext = createContext();
 export const pageContext = createContext();
@@ -14,8 +14,10 @@ export const AlbumPage = () => {
 	const [ page, setPage ] = useState([]);
 	const [ dragImages, setDragImages ] = useState([]);
 	const [ index, setIndex ] = useState(0);
+	const [ isLoad, setisLoad ] = useState(false);
 	const indexRef = useRef(0);
 	const cordinantsRef = useRef({});
+
 	// const canvas = useRef();
 
 	const removePage = () => {
@@ -52,10 +54,9 @@ export const AlbumPage = () => {
 	const initAllPage = (arr) => {
 		for (let i = 0; i < arr.length; i += 4) {
 			allPages.push(arr.slice(i, i + 4));
-			console.log(allPages);
 		}
+		setisLoad(true);
 		setPage(() => allPages[0]);
-		console.log(page);
 	};
 
 	const removePhoto = (pageId, photonumber) => {
@@ -105,18 +106,7 @@ export const AlbumPage = () => {
 		setDragImages(pageWithoutElement);
 	};
 
-	const changePhotoParametrs = (photoId, dictio) => {
-		page.map((element) => {
-			if ((element.id = photoId)) {
-				for (const [ key, value ] in dictio) {
-					element[key] = value;
-				}
-				return true;
-			}
-		});
-	};
-
-	function downloadPhotos(albumId) {
+	function downLoadPhotos(albumId) {
 		axios
 			.get(`https://run.mocky.io/v3/c3b8a64f-87b3-44c8-bf95-a63c32168389/${albumId}`)
 			.then((response) => {
@@ -128,7 +118,7 @@ export const AlbumPage = () => {
 
 	useEffect(
 		() => {
-			downloadPhotos(parms.id);
+			downLoadPhotos(parms.id);
 		},
 		[ parms.id ]
 	);
@@ -143,11 +133,24 @@ export const AlbumPage = () => {
 
 	return (
 		<div className="flex-column main">
+			{!isLoad && (
+				<div className="absolute-center">
+					<AutorenewIcon className="spin" />
+				</div>
+			)}
 			<pageContext.Provider value={{ page, allPages, index, nextPage, previousPage, removePage, newPage }}>
 				<CanvasPageControler />
 			</pageContext.Provider>
 			<photoContext.Provider
-				value={{ cordinantsRef, page, dragImages, changePhotoParametrs, fromDragToPage, fromPageToDrag }}
+				value={{
+					isLoad,
+					cordinantsRef,
+					allPages,
+					page,
+					dragImages,
+					fromDragToPage,
+					fromPageToDrag
+				}}
 			>
 				<PhotoCanvas />
 				<PhotoPlaceholder />

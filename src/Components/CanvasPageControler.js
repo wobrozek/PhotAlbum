@@ -10,7 +10,7 @@ import { saveAs } from 'file-saver';
 
 export const CanvasPageControler = () => {
 	const saveAlbum = () => {
-		const image = createDocxImage(300, 300, 300, 300);
+		const image = createDocxImage(300, 300, 1014400, 1014400);
 		const doc = new Document({
 			sections: [
 				{

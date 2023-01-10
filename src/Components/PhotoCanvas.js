@@ -3,9 +3,11 @@ import { useState, useEffect, useRef, useContext } from 'react';
 import { fabric } from 'fabric';
 import CloseIcon from '@mui/icons-material/Close';
 import { photoContext } from '../Pages/AlbumPage';
+import { height } from '@mui/system';
 
 function PhotoCanvas(props) {
 	const isInitialMount = useRef(true);
+	const isInitalPhotos = useRef(true);
 	const canvas = useRef(null);
 	const context = useContext(photoContext);
 
@@ -15,17 +17,126 @@ function PhotoCanvas(props) {
 				canvas.current = initCanvas();
 				isInitialMount.current = false;
 			} else {
-				console.log('rerender');
-				if (context.page) addElements(canvas.current);
+				if (context.page) {
+					addElements(canvas.current);
+				}
 			}
 		},
 		[ context.page ]
 	);
 
+	useEffect(
+		() => {
+			if (context.isLoad) {
+				photoSizeAndPosition(canvas.current);
+			}
+		},
+		[ context.isLoad ]
+	);
+
+	const photoSizeAndPosition = () => {
+		console.log(context.allPages);
+		const canvasHeight = context.cordinantsRef.current.height;
+		const canvasWidth = context.cordinantsRef.current.width;
+
+		context.allPages[0].map((_, columnIndex) => {
+			let rowIndex = 0;
+			context.allPages.map((row) => {
+				if (!row[columnIndex]) return;
+				let i = new Image();
+
+				i.onload = function() {
+					context.allPages[i.rowIndex][i.columnIndex].height = i.height;
+					context.allPages[i.rowIndex][i.columnIndex].width = i.width;
+				};
+
+				i.src = `data:image/jpg;base64,${row[columnIndex].base64}`;
+				i.columnIndex = columnIndex;
+				i.rowIndex = rowIndex;
+				rowIndex += 1;
+			});
+		});
+
+		context.allPages[0].map((_, columnIndex) => {
+			let rowIndex = 0;
+			let top = 5;
+			let left = 5;
+			context.allPages.map((row) => {
+				if (!row[columnIndex]) return;
+
+				const [ newLeft, newTop ] = setPosition(top, left, columnIndex, rowIndex, canvasWidth, canvasHeight);
+
+				left = newLeft;
+				top = newTop;
+				rowIndex += 1;
+			});
+		});
+
+		console.log(context.allPages);
+	};
+
+	function setPosition(top, left, columnIndex, rowIndex, canvasWidth, canvasHeight) {
+		console.log(context.allPages[rowIndex][columnIndex]);
+		let photoWidth = context.allPages[rowIndex][columnIndex].width;
+		let photoHeight = context.allPages[rowIndex][columnIndex].height;
+		let halfCanvasWidth = canvasWidth / 2 - 10;
+		let halfCanvasHeight = canvasHeight / 2 - 10;
+		let aspectRatio = photoWidth / photoHeight;
+
+		if (top > left) {
+			if (photoHeight > photoWidth) {
+				setHorizontal(top, left, columnIndex, rowIndex, aspectRatio, halfCanvasHeight);
+				left = halfCanvasWidth;
+			} else {
+				setVertical(top, left, columnIndex, rowIndex, aspectRatio, halfCanvasWidth);
+				left = halfCanvasWidth;
+			}
+		} else if (top < left) {
+			if (photoHeight > photoWidth) {
+				setHorizontal(top, left, columnIndex, rowIndex, aspectRatio, halfCanvasHeight);
+				top = halfCanvasHeight;
+			} else {
+				setVertical(top, left, columnIndex, rowIndex, aspectRatio, halfCanvasWidth);
+				top = halfCanvasHeight;
+			}
+		} else if (top === left) {
+			if (photoHeight > photoWidth) {
+				setHorizontal(top, left, columnIndex, rowIndex, aspectRatio, halfCanvasHeight);
+				left = halfCanvasWidth;
+			} else {
+				setVertical(top, left, columnIndex, rowIndex, aspectRatio, halfCanvasWidth);
+				left = halfCanvasWidth;
+			}
+		}
+		return [ top, left ];
+	}
+
+	function setVertical(top, left, columnIndex, rowIndex, aspectRatio, halfCanvasWidth) {
+		context.allPages[rowIndex][columnIndex].top = top;
+		context.allPages[rowIndex][columnIndex].left = left;
+		context.allPages[rowIndex][columnIndex].width = halfCanvasWidth;
+		context.allPages[rowIndex][columnIndex].height = halfCanvasWidth * aspectRatio;
+	}
+
+	function setHorizontal(top, left, columnIndex, rowIndex, aspectRatio, halfCanvasHeight) {
+		context.allPages[rowIndex][columnIndex].top = top;
+		context.allPages[rowIndex][columnIndex].left = left;
+		context.allPages[rowIndex][columnIndex].width = halfCanvasHeight / aspectRatio;
+		context.allPages[rowIndex][columnIndex].height = halfCanvasHeight;
+	}
+
 	function getSize() {
-		let width = window.innerWidth - 40;
-		let height = window.innerHeight - 200;
-		return [ width, height ];
+		const msWordAspectRatio = 297 / 210;
+
+		if (window.innerHeight > window.innerWidth) {
+			let width = window.innerWidth - 40;
+			let height = width * msWordAspectRatio;
+			return [ width, height ];
+		} else {
+			let height = window.innerHeight - 300;
+			let width = height / msWordAspectRatio;
+			return [ width, height ];
+		}
 	}
 
 	const initCanvas = () => {
@@ -46,7 +157,7 @@ function PhotoCanvas(props) {
 
 		//edit photo edit border
 		fabric.Object.prototype.transparentCorners = false;
-		fabric.Object.prototype.cornerColor = 'blue';
+		fabric.Object.prototype.cornerColor = '#924274';
 		fabric.Object.prototype.cornerStyle = 'circle';
 
 		//add delete button

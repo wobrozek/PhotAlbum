@@ -33,13 +33,17 @@ const DragImage = (props) => {
 		width.current = e.target.offsetLeft;
 		setStyle((currrent) => ({
 			...currrent,
-			position: 'fixed'
+			position: 'fixed',
+			left: width.current,
+			top: height.current
 		}));
 	};
 
 	const handleMove = (x, y, e) => {
-		const diferenceY = y - height.current;
-		const diferenceX = x - width.current;
+		const halfElementHeight = e.target.height / 2;
+		const halfElementWidth = e.target.width / 2;
+		const diferenceY = y - height.current - halfElementHeight;
+		const diferenceX = x - width.current - halfElementWidth;
 
 		setStyle((currrent) => ({
 			...currrent,

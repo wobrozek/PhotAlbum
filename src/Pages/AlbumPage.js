@@ -97,6 +97,7 @@ export const AlbumPage = () => {
 		if (!isInCanvas(x, y)) return;
 		const pageWithoutElement = dragImages.filter((element) => {
 			if (photoId !== element.id) {
+				console.log(photoId, element.id);
 				return element;
 			} else {
 				allPages[index].push(element);
@@ -104,6 +105,19 @@ export const AlbumPage = () => {
 			}
 		});
 		setDragImages(pageWithoutElement);
+	};
+
+	const changePhotoParametrs = (photoId, dictio) => {
+		let row = 0;
+		allPages[indexRef.current].map((element) => {
+			if (element.id === photoId) {
+				for (const [ key, value ] of Object.entries(dictio)) {
+					allPages[indexRef.current][row][key] = value;
+				}
+				return true;
+			}
+			row++;
+		});
 	};
 
 	function downLoadPhotos(albumId) {
@@ -144,6 +158,7 @@ export const AlbumPage = () => {
 			<photoContext.Provider
 				value={{
 					isLoad,
+					changePhotoParametrs,
 					cordinantsRef,
 					allPages,
 					page,

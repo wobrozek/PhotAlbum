@@ -24,6 +24,25 @@ code {
   color: blue;
 }
 
+.absolute-center {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+}
+
+.absolute-center>.spin {
+  width: 60px;
+  height: 60px;
+  animation: 2s infinite Load-spin;
+}
+
 button {
   background-color: #fff;
   border: 0 solid #fff;

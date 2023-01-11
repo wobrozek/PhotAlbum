@@ -47,7 +47,6 @@ function PhotoCanvas(props) {
 				lastI = i;
 
 				i.onload = function() {
-					console.log(i.height, i.width);
 					context.allPages[i.rowIndex][i.columnIndex].height = i.height;
 					context.allPages[i.rowIndex][i.columnIndex].width = i.width;
 				};
@@ -92,16 +91,16 @@ function PhotoCanvas(props) {
 				top = 10;
 				break;
 			case 2:
-				top = 10 + halfCanvasHeight;
+				top = 20 + halfCanvasHeight;
 				left = 10;
 				break;
 			case 3:
-				top = 10 + halfCanvasHeight;
-				left = 10 + halfCanvasWidth;
+				top = 20 + halfCanvasHeight;
+				left = 20 + halfCanvasWidth;
 				break;
 			default:
-				top = 0;
-				left = 0;
+				top = 10;
+				left = 10;
 		}
 
 		if (photoHeight > photoWidth) {
@@ -120,6 +119,7 @@ function PhotoCanvas(props) {
 		context.allPages[rowIndex][columnIndex].left = left;
 		context.allPages[rowIndex][columnIndex].width = halfCanvasWidth;
 		context.allPages[rowIndex][columnIndex].height = halfCanvasWidth / aspectRatio;
+		context.allPages[rowIndex][columnIndex].angle = 0;
 	}
 
 	function setHorizontal(top, left, columnIndex, rowIndex, aspectRatio, halfCanvasHeight) {
@@ -127,6 +127,7 @@ function PhotoCanvas(props) {
 		context.allPages[rowIndex][columnIndex].left = left;
 		context.allPages[rowIndex][columnIndex].width = halfCanvasHeight / aspectRatio;
 		context.allPages[rowIndex][columnIndex].height = halfCanvasHeight;
+		context.allPages[rowIndex][columnIndex].angle = 0;
 	}
 
 	function getSize() {
@@ -205,14 +206,41 @@ function PhotoCanvas(props) {
 
 		context.page.map((element) => {
 			fabric.Image.fromURL(`data:image/jpg;base64,${element.base64}`, function(oImg) {
-				oImg.set({
-					left: element.left,
-					top: element.top
-				});
-				oImg.id = element.id;
 				oImg.scaleToWidth(element.width);
 				oImg.scaleToHeight(element.height);
+
+				oImg.set({
+					left: element.left,
+					top: element.top,
+					angle: element.angle
+				});
+				oImg.id = element.id;
+
 				canvi.add(oImg);
+
+				canvi.setActiveObject(oImg);
+
+				canvi.on('object:modified', function() {
+					let clearedObject;
+
+					if (typeof canvi.getActiveObject() !== 'undefined') {
+						clearedObject = canvi.getActiveObject();
+						let width = clearedObject.scaleX * clearedObject.width;
+						let height = clearedObject.scaleY * clearedObject.height;
+
+						let dict = {
+							width: width,
+							height: height,
+							angle: Math.round(clearedObject.angle * 100) / 100,
+							top: clearedObject.top,
+							left: clearedObject.left
+						};
+
+						context.changePhotoParametrs(clearedObject.id, dict);
+					} else {
+						clearedObject = canvi.getActiveGroup();
+					}
+				});
 			});
 		});
 		canvi.renderAll();

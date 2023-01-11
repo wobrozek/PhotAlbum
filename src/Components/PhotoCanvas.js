@@ -34,42 +34,38 @@ function PhotoCanvas(props) {
 		[ context.isLoad ]
 	);
 
+	const calculateSizeOfImage = (rowIndex, columnIndex) => {
+		return new Promise((resolve, reject) => {
+			let i = new Image();
+
+			i.onload = () =>
+				resolve({ width: i.width, height: i.height, columnIndex: i.columnIndex, rowIndex: i.rowIndex });
+
+			i.src = `data:image/jpg;base64,${context.allPages[rowIndex][columnIndex].base64}`;
+			i.columnIndex = columnIndex;
+			i.rowIndex = rowIndex;
+		});
+	};
+
+	// everey photo must have height and weight left offset nad top offest to export to docx
 	const photoSizeAndPosition = () => {
 		const canvasHeight = context.cordinantsRef.current.height;
 		const canvasWidth = context.cordinantsRef.current.width;
-		let lastI = null;
 
 		context.allPages[0].map((_, columnIndex) => {
 			let rowIndex = 0;
 			context.allPages.map((row) => {
 				if (!row[columnIndex]) return;
-				let i = new Image();
-				lastI = i;
 
-				i.onload = function() {
-					context.allPages[i.rowIndex][i.columnIndex].height = i.height;
-					context.allPages[i.rowIndex][i.columnIndex].width = i.width;
-				};
+				calculateSizeOfImage(rowIndex, columnIndex).then((dictio) => {
+					context.allPages[dictio.rowIndex][dictio.columnIndex].height = dictio.height;
+					context.allPages[dictio.rowIndex][dictio.columnIndex].width = dictio.width;
+					setPosition(dictio.columnIndex, dictio.rowIndex, canvasWidth, canvasHeight);
+				});
 
-				i.src = `data:image/jpg;base64,${row[columnIndex].base64}`;
-				i.columnIndex = columnIndex;
-				i.rowIndex = rowIndex;
 				rowIndex += 1;
 			});
 		});
-
-		lastI.onload = function() {
-			context.allPages[0].map((_, columnIndex) => {
-				let rowIndex = 0;
-				context.allPages.map((row) => {
-					if (!row[columnIndex]) return;
-
-					const [ newLeft, newTop ] = setPosition(columnIndex, rowIndex, canvasWidth, canvasHeight);
-
-					rowIndex += 1;
-				});
-			});
-		};
 	};
 
 	function setPosition(columnIndex, rowIndex, canvasWidth, canvasHeight) {
@@ -105,13 +101,9 @@ function PhotoCanvas(props) {
 
 		if (photoHeight > photoWidth) {
 			setHorizontal(top, left, columnIndex, rowIndex, aspectRatio, halfCanvasHeight);
-			left = halfCanvasWidth;
 		} else {
 			setVertical(top, left, columnIndex, rowIndex, aspectRatio, halfCanvasWidth);
-			left = halfCanvasWidth;
 		}
-
-		return [ left, top ];
 	}
 
 	function setVertical(top, left, columnIndex, rowIndex, aspectRatio, halfCanvasWidth) {
@@ -160,7 +152,7 @@ function PhotoCanvas(props) {
 			left: canvi._offset.left
 		};
 
-		//edit photo edit border
+		// edit border
 		fabric.Object.prototype.transparentCorners = false;
 		fabric.Object.prototype.cornerColor = '#924274';
 		fabric.Object.prototype.cornerStyle = 'circle';

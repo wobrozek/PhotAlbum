@@ -100,6 +100,10 @@ export const AlbumPage = () => {
 				console.log(photoId, element.id);
 				return element;
 			} else {
+				let halfPhotoWidth = element.width / 2;
+				let halfphotoHeight = element.height / 2;
+				element.left = x - halfPhotoWidth;
+				element.top = y - halfphotoHeight;
 				allPages[index].push(element);
 				setPage(() => [ ...allPages[index] ]);
 			}

@@ -151,7 +151,9 @@ export const AlbumPage = () => {
 					<AutorenewIcon className="spin" />
 				</div>
 			)}
-			<pageContext.Provider value={{ page, allPages, index, nextPage, previousPage, removePage, newPage }}>
+			<pageContext.Provider
+				value={{ cordinantsRef, page, allPages, index, nextPage, previousPage, removePage, newPage }}
+			>
 				<CanvasPageControler />
 			</pageContext.Provider>
 			<photoContext.Provider

@@ -5,28 +5,28 @@ import AddIcon from '@mui/icons-material/Add';
 import DownloadIcon from '@mui/icons-material/Download';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AlbumPage, { pageContext } from '../Pages/AlbumPage';
-import { Document, Packer, Paragraph, ImageRun, TextRun } from 'docx';
+import { Document, Packer, Paragraph, ImageRun, PageBreak } from 'docx';
 import { saveAs } from 'file-saver';
 
 export const CanvasPageControler = () => {
+	const context = useContext(pageContext);
+
 	const saveAlbum = () => {
+		console.log(context.cordinantsRef.current.width, context.cordinantsRef.current.height);
+		let aspectRatio = 796 / context.cordinantsRef.current.width;
 		let paragraphArray = [];
 
-		context.allPages[0].map((_, columnIndex) => {
-			let rowIndex = 0;
-			context.allPages.map((row) => {
-				if (!row[columnIndex]) return;
+		context.allPages.map((_, rowIndex) => {
+			let columnIndex = 0;
+			context.allPages[rowIndex].map((row) => {
+				paragraphArray.push(pharagraphCreator(context.allPages[rowIndex][columnIndex], aspectRatio));
 
-				paragraphArray.push(pharagraphCreator(context.allPages[rowIndex][columnIndex]));
-
-				rowIndex++;
+				columnIndex++;
 			});
-		});
 
-		let img = [ pharagraphCreator(context.allPages[0][0]) ];
-		img.push(pharagraphCreator(context.allPages[0][1]));
-		console.log(...paragraphArray);
-		console.log('orginal', img);
+			//add new page if not last
+			if (rowIndex !== context.allPages.length - 1) paragraphArray.push(pharagraphPageBreak());
+		});
 
 		const doc = new Document({
 			sections: [
@@ -36,30 +36,30 @@ export const CanvasPageControler = () => {
 			]
 		});
 
-		console.log(doc);
-
 		Packer.toBlob(doc).then((blob) => {
 			saveAs(blob, 'Album Ślubny.docx');
 		});
 	};
 
-	const pharagraphCreator = (photo) => {
-		console.log(photo.top, photo.left);
+	const pharagraphCreator = (photo, multiply) => {
+		//convert pixels to enums
+		let left = Math.floor(photo.top / 96 * multiply * 914400);
+		let top = Math.floor(photo.left / 96 * multiply * 914400);
 		let img = new Paragraph({
 			children: [
 				new ImageRun({
 					data: photo.base64,
 					transformation: {
-						width: photo.width,
-						height: photo.height,
-						roation: photo.angle
+						width: photo.width * multiply,
+						height: photo.height * multiply,
+						rotation: photo.angle
 					},
 					floating: {
 						horizontalPosition: {
-							offset: 100
+							offset: top
 						},
 						verticalPosition: {
-							offset: 200
+							offset: left
 						}
 					}
 				})
@@ -69,26 +69,12 @@ export const CanvasPageControler = () => {
 		return img;
 	};
 
-	// const createDocxImage = (heightPhoto, widthPhoto, offsetLeft, offsetTop) => {
-	// 	let image = new ImageRun({
-	// 		data: context.allPages[0][0].base64,
-	// 		transformation: {
-	// 			width: widthPhoto,
-	// 			height: heightPhoto
-	// 		},
-	// 		floating: {
-	// 			horizontalPosition: {
-	// 				offset: offsetLeft
-	// 			},
-	// 			verticalPosition: {
-	// 				offset: offsetTop
-	// 			}
-	// 		}
-	// 	});
-	// 	return image;
-	// };
+	const pharagraphPageBreak = () => {
+		return new Paragraph({
+			children: [ new PageBreak() ]
+		});
+	};
 
-	const context = useContext(pageContext);
 	return (
 		<nav className="flex-space-between navbar">
 			<div className="flex">

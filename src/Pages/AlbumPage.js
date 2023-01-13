@@ -59,12 +59,8 @@ export const AlbumPage = () => {
 		setPage(() => allPages[0]);
 	};
 
-	const removePhoto = (pageId, photonumber) => {
-		allPages[pageId].splice(photonumber, photonumber);
-	};
-
-	const addPhoto = (pageId, photo) => {
-		setPage[pageId].push(photo);
+	const refreshPage = () => {
+		setPage([ ...allPages[indexRef.current] ]);
 	};
 
 	const fromPageToDrag = (photoId) => {
@@ -97,7 +93,6 @@ export const AlbumPage = () => {
 		if (!isInCanvas(x, y)) return;
 		const pageWithoutElement = dragImages.filter((element) => {
 			if (photoId !== element.id) {
-				console.log(photoId, element.id);
 				return element;
 			} else {
 				let halfPhotoWidth = element.width / 2;
@@ -162,11 +157,12 @@ export const AlbumPage = () => {
 			<photoContext.Provider
 				value={{
 					isLoad,
-					changePhotoParametrs,
 					cordinantsRef,
 					allPages,
 					page,
 					dragImages,
+					refreshPage,
+					changePhotoParametrs,
 					fromDragToPage,
 					fromPageToDrag
 				}}

@@ -61,8 +61,8 @@ function PhotoCanvas(props) {
 					context.allPages[dictio.rowIndex][dictio.columnIndex].height = dictio.height;
 					context.allPages[dictio.rowIndex][dictio.columnIndex].width = dictio.width;
 					setPosition(dictio.columnIndex, dictio.rowIndex, canvasWidth, canvasHeight);
+					context.refreshPage();
 				});
-
 				rowIndex += 1;
 			});
 		});
@@ -117,7 +117,7 @@ function PhotoCanvas(props) {
 	function setHorizontal(top, left, columnIndex, rowIndex, aspectRatio, halfCanvasHeight) {
 		context.allPages[rowIndex][columnIndex].top = top;
 		context.allPages[rowIndex][columnIndex].left = left;
-		context.allPages[rowIndex][columnIndex].width = halfCanvasHeight / aspectRatio;
+		context.allPages[rowIndex][columnIndex].width = halfCanvasHeight * aspectRatio;
 		context.allPages[rowIndex][columnIndex].height = halfCanvasHeight;
 		context.allPages[rowIndex][columnIndex].angle = 0;
 	}
@@ -210,8 +210,16 @@ function PhotoCanvas(props) {
 
 				canvi.add(oImg);
 
+				// let dict = {
+				// 	width: oImg.width * oImg.scaleX,
+				// 	height: oImg.height * oImg.scaleY
+				// };
+
+				// context.changePhotoParametrs(oImg.id, dict);
+
 				canvi.setActiveObject(oImg);
 
+				//add event on modiied
 				canvi.on('object:modified', function() {
 					let clearedObject;
 

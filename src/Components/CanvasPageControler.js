@@ -4,48 +4,89 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AddIcon from '@mui/icons-material/Add';
 import DownloadIcon from '@mui/icons-material/Download';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { pageContext } from '../Pages/AlbumPage';
-import { Document, Packer, Paragraph, ImageRun } from 'docx';
+import AlbumPage, { pageContext } from '../Pages/AlbumPage';
+import { Document, Packer, Paragraph, ImageRun, TextRun } from 'docx';
 import { saveAs } from 'file-saver';
 
 export const CanvasPageControler = () => {
 	const saveAlbum = () => {
-		const image = createDocxImage(300, 300, 1014400, 1014400);
+		let paragraphArray = [];
+
+		context.allPages[0].map((_, columnIndex) => {
+			let rowIndex = 0;
+			context.allPages.map((row) => {
+				if (!row[columnIndex]) return;
+
+				paragraphArray.push(pharagraphCreator(context.allPages[rowIndex][columnIndex]));
+
+				rowIndex++;
+			});
+		});
+
+		let img = [ pharagraphCreator(context.allPages[0][0]) ];
+		img.push(pharagraphCreator(context.allPages[0][1]));
+		console.log(...paragraphArray);
+		console.log('orginal', img);
+
 		const doc = new Document({
 			sections: [
 				{
-					children: [
-						new Paragraph({
-							children: [ image ]
-						})
-					]
+					children: [ ...paragraphArray ]
 				}
 			]
 		});
+
+		console.log(doc);
 
 		Packer.toBlob(doc).then((blob) => {
 			saveAs(blob, 'Album Ślubny.docx');
 		});
 	};
 
-	const createDocxImage = (heightPhoto, widthPhoto, offsetLeft, offsetTop) => {
-		let image = new ImageRun({
-			data: context.allPages[0][0].base64,
-			transformation: {
-				width: widthPhoto,
-				height: heightPhoto
-			},
-			floating: {
-				horizontalPosition: {
-					offset: offsetLeft
-				},
-				verticalPosition: {
-					offset: offsetTop
-				}
-			}
+	const pharagraphCreator = (photo) => {
+		console.log(photo.top, photo.left);
+		let img = new Paragraph({
+			children: [
+				new ImageRun({
+					data: photo.base64,
+					transformation: {
+						width: photo.width,
+						height: photo.height,
+						roation: photo.angle
+					},
+					floating: {
+						horizontalPosition: {
+							offset: 100
+						},
+						verticalPosition: {
+							offset: 200
+						}
+					}
+				})
+			]
 		});
-		return image;
+
+		return img;
 	};
+
+	// const createDocxImage = (heightPhoto, widthPhoto, offsetLeft, offsetTop) => {
+	// 	let image = new ImageRun({
+	// 		data: context.allPages[0][0].base64,
+	// 		transformation: {
+	// 			width: widthPhoto,
+	// 			height: heightPhoto
+	// 		},
+	// 		floating: {
+	// 			horizontalPosition: {
+	// 				offset: offsetLeft
+	// 			},
+	// 			verticalPosition: {
+	// 				offset: offsetTop
+	// 			}
+	// 		}
+	// 	});
+	// 	return image;
+	// };
 
 	const context = useContext(pageContext);
 	return (

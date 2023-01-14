@@ -41,7 +41,7 @@ function PhotoCanvas(props) {
 			i.onload = () =>
 				resolve({ width: i.width, height: i.height, columnIndex: i.columnIndex, rowIndex: i.rowIndex });
 
-			i.src = `data:image/jpg;base64,${context.allPages[rowIndex][columnIndex].base64}`;
+			i.src = context.allPages[rowIndex][columnIndex].base64;
 			i.columnIndex = columnIndex;
 			i.rowIndex = rowIndex;
 		});
@@ -197,7 +197,7 @@ function PhotoCanvas(props) {
 		canvi.backgroundColor = '#D9D9D9';
 
 		context.page.map((element) => {
-			fabric.Image.fromURL(`data:image/jpg;base64,${element.base64}`, function(oImg) {
+			fabric.Image.fromURL(element.base64, function(oImg) {
 				oImg.scaleToWidth(element.width);
 				oImg.scaleToHeight(element.height);
 

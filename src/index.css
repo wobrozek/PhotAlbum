@@ -20,6 +20,11 @@ code {
   padding: 10px;
 }
 
+.navbar svg {
+  margin: 0 5px 0 5px;
+  border-radius: 50%;
+}
+
 .photoCanvas {
   color: blue;
 }
@@ -89,6 +94,10 @@ button {
 .flex-column {
   display: flex;
   flex-direction: column;
+}
+
+.error {
+  margin: 10px;
 }
 
 @keyframes Load-spin {

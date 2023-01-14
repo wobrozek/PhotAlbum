@@ -1,7 +1,7 @@
 import { CanvasPageControler } from '../Components/CanvasPageControler';
 import { PhotoPlaceholder } from '../Components/PhotoPlaceholder';
-import { createContext, useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { createContext, useState, useEffect, useRef } from 'react';
+import { Navigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import PhotoCanvas from '../Components/PhotoCanvas';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
@@ -15,6 +15,7 @@ export const AlbumPage = () => {
 	const [ dragImages, setDragImages ] = useState([]);
 	const [ index, setIndex ] = useState(0);
 	const [ isLoad, setisLoad ] = useState(false);
+	const [ isEror, setIsError ] = useState(false);
 	const indexRef = useRef(0);
 	const cordinantsRef = useRef({});
 
@@ -29,7 +30,7 @@ export const AlbumPage = () => {
 		if (index > allPages.length - 1 && index !== 0) {
 			setIndex((piervIndex) => piervIndex - 1);
 		} else {
-			setPage(() => allPages[index]);
+			setPage(() => [ ...allPages[index] ]);
 		}
 	};
 
@@ -121,9 +122,14 @@ export const AlbumPage = () => {
 
 	function downLoadPhotos(albumId) {
 		axios
-			.get(`https://run.mocky.io/v3/c3b8a64f-87b3-44c8-bf95-a63c32168389/${albumId}`)
+			.get(`https://cupid.azurewebsites.net/albums/${albumId}/photos`)
 			.then((response) => {
-				initAllPage(response.data);
+				console.log(response.data);
+				if (!response.data || response.data.length == 0) {
+					setIsError(true);
+				} else {
+					initAllPage(response.data);
+				}
 			})
 			.catch((err) => console.error(err.message));
 	}
@@ -151,6 +157,7 @@ export const AlbumPage = () => {
 					<AutorenewIcon className="spin" />
 				</div>
 			)}
+			{isEror && <Navigate to="/" />}
 			<pageContext.Provider
 				value={{ cordinantsRef, page, allPages, index, nextPage, previousPage, removePage, newPage }}
 			>

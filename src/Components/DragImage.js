@@ -69,12 +69,7 @@ const DragImage = (props) => {
 			// onMouseMove={mouseMove}
 			// onMouseUp={mouseEnd}
 		>
-			<img
-				src={`data:image/jpg;base64,${props.element.base64}`}
-				alt=""
-				key={props.element.id}
-				data-photoid={props.element.id}
-			/>
+			<img src={props.element.base64} alt="" key={props.element.id} data-photoid={props.element.id} />
 		</div>
 	);
 };

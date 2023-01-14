@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AddIcon from '@mui/icons-material/Add';
@@ -10,6 +10,9 @@ import { saveAs } from 'file-saver';
 
 export const CanvasPageControler = () => {
 	const context = useContext(pageContext);
+	const [ isLast, setIsLast ] = useState(false);
+	const [ isFirst, setIsFirst ] = useState(false);
+	const [ isOne, setIsOne ] = useState(false);
 
 	const saveAlbum = () => {
 		console.log(context.cordinantsRef.current.width, context.cordinantsRef.current.height);
@@ -69,28 +72,61 @@ export const CanvasPageControler = () => {
 		return img;
 	};
 
+	useEffect(
+		() => {
+			if (context.allPages.length === 1) {
+				setIsOne(true);
+				setIsFirst(true);
+				setIsLast(true);
+			} else if (context.index === context.allPages.length - 1) {
+				setIsLast(true);
+				setIsFirst(false);
+				setIsOne(false);
+			} else if (context.index === 0) {
+				setIsFirst(true);
+				setIsLast(false);
+				setIsOne(false);
+			} else {
+				setIsFirst(false);
+				setIsLast(false);
+				setIsOne(false);
+			}
+		},
+		[ context.index, context.page ]
+	);
+
 	const pharagraphPageBreak = () => {
 		return new Paragraph({
 			children: [ new PageBreak() ]
 		});
 	};
 
+	const styleBack = {
+		backgroundColor: isFirst ? '#978E91' : '#000',
+		fill: '#fff'
+	};
+
+	const styleNext = {
+		backgroundColor: isLast ? '#978E91' : '#000',
+		fill: '#fff'
+	};
+
 	return (
 		<nav className="flex-space-between navbar">
 			<div className="flex">
 				<button className="btn-round" onClick={context.previousPage}>
-					<ArrowBackIcon />
+					<ArrowBackIcon style={styleBack} />
 				</button>
-				<div>Strona{context.index}</div>
+				<div>{`Strona ${context.index}`}</div>
 				<button className="btn-round" onClick={context.nextPage}>
-					<ArrowForwardIcon />
+					<ArrowForwardIcon style={styleNext} />
 				</button>
 			</div>
 			<div className="flex">
 				<button onClick={context.newPage}>
 					<AddIcon />
 				</button>
-				<button onClick={context.removePage}>
+				<button onClick={context.removePage} style={{ fill: isOne ? '#978E91 ' : '#000' }}>
 					<DeleteIcon />
 				</button>
 				<button>

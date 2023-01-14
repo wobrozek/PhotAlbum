@@ -15,7 +15,6 @@ export const CanvasPageControler = () => {
 	const [ isOne, setIsOne ] = useState(false);
 
 	const saveAlbum = () => {
-		console.log(context.cordinantsRef.current.width, context.cordinantsRef.current.height);
 		let aspectRatio = 796 / context.cordinantsRef.current.width;
 		let paragraphArray = [];
 

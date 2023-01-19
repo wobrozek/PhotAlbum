@@ -53,6 +53,11 @@ export const AlbumPage = () => {
 
 	// divide all photos into pages
 	const initAllPage = (arr) => {
+		arr=arr.map((element)=>{
+			if(element.base64.slice(0,23) !== "data:image/jpeg;base64,") element.base64 = "data:image/jpeg;base64," +element.base64;
+			return element;
+		})
+
 		for (let i = 0; i < arr.length; i += 4) {
 			allPages.push(arr.slice(i, i + 4));
 		}
@@ -124,7 +129,6 @@ export const AlbumPage = () => {
 		axios
 			.get(`https://cupid.azurewebsites.net/albums/${albumId}/photos`)
 			.then((response) => {
-				console.log(response.data);
 				if (!response.data || response.data.length == 0) {
 					setIsError(true);
 				} else {

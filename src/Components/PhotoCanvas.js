@@ -197,6 +197,7 @@ function PhotoCanvas(props) {
 		canvi.backgroundColor = '#D9D9D9';
 
 		context.page.map((element) => {
+
 			fabric.Image.fromURL(element.base64, function(oImg) {
 				oImg.scaleToWidth(element.width);
 				oImg.scaleToHeight(element.height);

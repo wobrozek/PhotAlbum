@@ -8,6 +8,7 @@ import AlbumPage, { pageContext } from '../Pages/AlbumPage';
 import { Document, Packer, Paragraph, ImageRun, PageBreak } from 'docx';
 import { saveAs } from 'file-saver';
 
+
 export const CanvasPageControler = () => {
 	const context = useContext(pageContext);
 	const [ isLast, setIsLast ] = useState(false);
